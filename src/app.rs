@@ -76,6 +76,7 @@ pub const HELP_TEXT: &str = "Atajos de teclado (Linux / Windows)\n\
 • Re Pág / Av Pág: mes anterior / siguiente.\n\
 • Enter: abrir la nota del día seleccionado.\n\
 • T: volver al mes actual.\n\
+• F1: abrir esta ayuda.\n\
 • Ctrl+S (en el editor): guardar sin cerrar.\n\
 • Esc (en el editor): guardar y cerrar.";
 pub struct CalendarApp {
@@ -353,6 +354,7 @@ impl CalendarApp {
                 egui::Key::PageDown => self.shift_month(1),
                 egui::Key::Enter => self.open_editor(self.selected_date),
                 egui::Key::T if !ctrl => self.go_today(),
+                egui::Key::F1 => self.help_open = true,
                 _ => {}
             }
         }
@@ -384,34 +386,6 @@ impl CalendarApp {
 // ------------------------------------------------------------------------ //
 
 impl CalendarApp {
-    /// Barra superior oscura con el título y el menú de ayuda.
-    fn header_panel(&mut self, ctx: &egui::Context) {
-        egui::TopBottomPanel::top("header")
-            .exact_height(40.0)
-            .frame(egui::Frame::NONE.fill(colors::HEADER_BG).stroke(Stroke::new(1.0, colors::NORMAL_BORDER)))
-            .show(ctx, |ui| {
-                ui.with_layout(Layout::left_to_right(Align::Center), |ui| {
-                    ui.add_space(12.0);
-                    ui.label(
-                        RichText::new("calendario").size(15.0).color(colors::HEADER_FG).strong(),
-                    );
-                    ui.with_layout(Layout::right_to_left(Align::Center), |ui| {
-                        ui.add_space(8.0);
-                        let menu = ui.menu_button(
-                            RichText::new("?").size(16.0).color(colors::HEADER_FG),
-                            |ui| {
-                                if ui.button("Ayuda").clicked() {
-                                    self.help_open = true;
-                                    ui.close_menu();
-                                }
-                            },
-                        );
-                        menu.response.on_hover_text("Menú");
-                    });
-                });
-            });
-    }
-
     /// Fila de navegación: ◀ Mes de año · [Hoy] ▶
     fn nav_row(&mut self, ui: &mut Ui) {
         let btn_size = Vec2::new(30.0, 26.0);
@@ -865,7 +839,6 @@ impl eframe::App for CalendarApp {
         self.watch_external_changes(ctx);
         self.handle_keys(ctx);
 
-        self.header_panel(ctx);
         self.bottom_panel(ctx);
         egui::CentralPanel::default()
             .frame(
