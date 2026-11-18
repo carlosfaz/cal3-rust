@@ -26,10 +26,10 @@ mod colors {
     pub const WEEKEND_HEADER_FG: Color32 = Color32::from_rgb(0x00, 0x00, 0x00);
     pub const DAY_BG: Color32 = Color32::from_rgb(0xFF, 0xFF, 0xFF);
     pub const DAY_FG: Color32 = Color32::from_rgb(0x00, 0x00, 0x00);
-    pub const WEEKEND_BG: Color32 = Color32::from_rgb(0xFF, 0xFF, 0xFF);
+    pub const WEEKEND_BG: Color32 = Color32::from_rgb(0xE4, 0xE4, 0xE4);
     pub const WEEKEND_FG: Color32 = Color32::from_rgb(0x00, 0x00, 0x00);
-    pub const TODAY_BG: Color32 = Color32::from_rgb(0xE4, 0xE4, 0xE4);
-    pub const TODAY_FG: Color32 = Color32::from_rgb(0x00, 0x00, 0x00);
+    pub const TODAY_BG: Color32 = Color32::from_rgb(0x35, 0x84, 0xE4);
+    pub const TODAY_FG: Color32 = Color32::from_rgb(0xFF, 0xFF, 0xFF);
     pub const SELECTED_BORDER: Color32 = Color32::from_rgb(0x00, 0x00, 0x00);
     pub const NORMAL_BORDER: Color32 = Color32::from_rgb(0x00, 0x00, 0x00);
     pub const NOTE_DOT: Color32 = Color32::from_rgb(0x00, 0x00, 0x00);
@@ -554,6 +554,8 @@ impl CalendarApp {
                     } else {
                         (colors::DAY_BG, colors::DAY_FG)
                     };
+                    // Sobre el azul de hoy, el resto del texto también va en blanco.
+                    let on_blue = tinted.is_none() && is_today;
                     let (border_w, border_c): (f32, Color32) = if is_selected {
                         (2.0, colors::SELECTED_BORDER)
                     } else {
@@ -577,7 +579,9 @@ impl CalendarApp {
                     if !preview.is_empty() {
                         child.add(
                             egui::Label::new(
-                                RichText::new(preview).size(12.5).color(colors::PREVIEW_FG),
+                                RichText::new(preview)
+                                    .size(12.5)
+                                    .color(if on_blue { fg } else { colors::PREVIEW_FG }),
                             )
                             .selectable(false)
                             .truncate(),
@@ -591,7 +595,7 @@ impl CalendarApp {
                             Align2::RIGHT_TOP,
                             "*",
                             FontId::proportional(26.0),
-                            colors::NOTE_DOT,
+                            if on_blue { fg } else { colors::NOTE_DOT },
                         );
                     }
                     if is_selected {
