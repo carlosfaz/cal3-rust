@@ -598,6 +598,18 @@ impl CalendarApp {
                             if on_blue { fg } else { colors::NOTE_DOT },
                         );
                     }
+                    // Daga (†) en el día actual; si también tiene nota, va a la
+                    // izquierda del asterisco.
+                    if is_today {
+                        let dx = if has_note { -22.0 } else { -6.0 };
+                        painter.text(
+                            rect.right_top() + Vec2::new(dx, 4.0),
+                            Align2::RIGHT_TOP,
+                            "†",
+                            FontId::proportional(22.0),
+                            fg,
+                        );
+                    }
                     if is_selected {
                         painter.rect_stroke(
                             rect.shrink(1.0),
