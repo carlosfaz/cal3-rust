@@ -2,14 +2,16 @@
 
 Calendario mensual con notas, escrito en Rust con
 [egui/eframe](https://github.com/emilk/egui). Port de `cal3.py` (Flet), para
-**Linux y Windows**. Estilo "máquina de escribir": fondo blanco, tinta negra,
-fuente monoespaciada y celdas en cuadrícula, como una tabla.
+**Linux, Windows y Android**. Fondo blanco, tinta negra, fuente monoespaciada
+y celdas en cuadrícula, como una tabla.
 
 ![Vista mensual](docs/calendario.png)
 
 ## Características
 
-- Vista mensual en cuadrícula, con los días de los meses vecinos en gris.
+- Vista mensual en cuadrícula, con los días de los meses vecinos en gris
+  oscuro y los sábados y domingos en gris claro.
+- El día actual se resalta en azul y lleva una daga `†`.
 - Cada día guarda una nota; las celdas con nota llevan una estrella `*` y
   muestran un resumen del texto.
 - **Clic derecho** en un día para pintarlo con uno de 8 colores suaves
@@ -18,6 +20,7 @@ fuente monoespaciada y celdas en cuadrícula, como una tabla.
   para insertar hora y fecha en la línea del cursor, casillas (`- [ ]`) y un
   botón `*` que alterna `*` → `•` → `►` → sin marcador.
 - Deshacer y rehacer los cambios guardados.
+- Ayuda de atajos con `F1` (en Android, con el botón `?`).
 - Tipografía Nimbus Mono (clon de Courier) incluida en `assets/`.
 
 | Colores del día | Editor de notas |
@@ -45,8 +48,13 @@ fuente monoespaciada y celdas en cuadrícula, como una tabla.
 | `Re Pág` / `Av Pág` | Mes anterior / siguiente |
 | `Enter` | Abrir la nota del día |
 | `T` | Volver a hoy |
+| `F1` | Ayuda de atajos |
+| `Ctrl+A` (editor) | Seleccionar todo el texto |
 | `Ctrl+S` (editor) | Guardar sin cerrar |
 | `Esc` (editor) | Guardar y cerrar |
+
+En Android los mismos atajos funcionan con un teclado físico, y el botón
+Atrás equivale a `Esc`.
 
 ## Compilar y ejecutar
 
@@ -96,3 +104,6 @@ Requiere `rustup target add aarch64-linux-android armv7-linux-androideabi`,
 `cargo install cargo-apk --locked` y el SDK/NDK de Android en `~/Android/sdk`.
 Las notas se guardan en `Android/data/com.carlosfaz.cal3rust/files/`. En el
 teléfono, el clic derecho (pintar un día) es una pulsación larga.
+
+`vendor/winit` es una copia de `winit` 0.30 con un parche para Android
+(modificadores del teclado y botón Atrás); ver `vendor/winit/PATCH.md`.

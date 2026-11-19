@@ -78,7 +78,8 @@ pub const HELP_TEXT: &str = "Atajos de teclado (Linux / Windows)\n\
 • T: volver al mes actual.\n\
 • F1: abrir esta ayuda.\n\
 • Ctrl+S (en el editor): guardar sin cerrar.\n\
-• Esc (en el editor): guardar y cerrar.";
+• Esc (en el editor): guardar y cerrar.\n\
+• Ctrl+A (en el editor): seleccionar todo.";
 pub struct CalendarApp {
     note_manager: NoteManager,
     today: NaiveDate,
@@ -913,7 +914,7 @@ impl eframe::App for CalendarApp {
 }
 
 
-/// Estilo "máquina de escribir": blanco, tinta negra, ángulos rectos, y
+/// Estilo sobrio: blanco, tinta negra, ángulos rectos, y
 /// la fuente monoespaciada (Nimbus Mono, clon de Courier) para todo el texto.
 pub fn setup_style(ctx: &egui::Context) {
     let mut fonts = egui::FontDefinitions::default();
