@@ -85,3 +85,14 @@ del sistema. Requiere `psutil` y `distro`:
 python3 -m pip install psutil distro
 python3 cfetch.py
 ```
+
+## Android (APK)
+
+```sh
+./build_android.sh        # deja cal3-rust.apk en la carpeta del proyecto
+```
+
+Requiere `rustup target add aarch64-linux-android armv7-linux-androideabi`,
+`cargo install cargo-apk --locked` y el SDK/NDK de Android en `~/Android/sdk`.
+Las notas se guardan en `Android/data/com.carlosfaz.cal3rust/files/`. En el
+teléfono, el clic derecho (pintar un día) es una pulsación larga.

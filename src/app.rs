@@ -397,9 +397,11 @@ impl CalendarApp {
             {
                 self.shift_month(-1);
             }
-            // Reserva el ancho de los dos botones de la derecha.
+            // Reserva el ancho de los botones de la derecha (en Android hay uno
+            // más, «?», porque allí no existe la tecla F1).
+            let n_right = if cfg!(target_os = "android") { 3.0 } else { 2.0 };
             let spacing = ui.spacing().item_spacing.x;
-            let label_w = (ui.available_width() - btn_size.x * 2.0 - spacing * 2.0).max(0.0);
+            let label_w = (ui.available_width() - btn_size.x * n_right - spacing * n_right).max(0.0);
             let (rect, _) = ui.allocate_exact_size(Vec2::new(label_w, 28.0), Sense::hover());
             let label = format!(
                 "{} de {}",
@@ -412,6 +414,14 @@ impl CalendarApp {
                 FontId::proportional(16.0),
                 colors::HEADER_FG,
             );
+            if cfg!(target_os = "android")
+                && ui
+                    .add_sized(btn_size, egui::Button::new(RichText::new("?").size(13.0)))
+                    .on_hover_text("Ayuda")
+                    .clicked()
+            {
+                self.help_open = true;
+            }
             if ui
                 .add_sized(btn_size, egui::Button::new(RichText::new("●").size(11.0)))
                 .on_hover_text("Ir a hoy")
@@ -834,10 +844,53 @@ impl CalendarApp {
     }
 }
 
+/// Márgenes (en puntos) que ocupan las barras del sistema de Android:
+/// (arriba, abajo, izquierda, derecha). En escritorio son 0.
+#[cfg(target_os = "android")]
+fn system_insets(ctx: &egui::Context) -> (f32, f32, f32, f32) {
+    type Cached = (Instant, Vec2, (f32, f32, f32, f32));
+    let id = egui::Id::new("system_insets");
+    let size = ctx.screen_rect().size();
+    if let Some((t, sz, v)) = ctx.data(|d| d.get_temp::<Cached>(id)) {
+        if sz == size && t.elapsed() < Duration::from_millis(1000) {
+            return v;
+        }
+    }
+    let ppp = ctx.pixels_per_point();
+    let v = match crate::android_window_insets() {
+        Some((t, b, l, r)) => (t as f32 / ppp, b as f32 / ppp, l as f32 / ppp, r as f32 / ppp),
+        None => (0.0, 0.0, 0.0, 0.0),
+    };
+    ctx.data_mut(|d| d.insert_temp::<Cached>(id, (Instant::now(), size, v)));
+    v
+}
+
+#[cfg(not(target_os = "android"))]
+fn system_insets(_ctx: &egui::Context) -> (f32, f32, f32, f32) {
+    (0.0, 0.0, 0.0, 0.0)
+}
+
 impl eframe::App for CalendarApp {
     fn update(&mut self, ctx: &egui::Context, _frame: &mut eframe::Frame) {
         self.watch_external_changes(ctx);
         self.handle_keys(ctx);
+
+        // Android: la ventana ocupa toda la pantalla, así que se dejan libres
+        // los márgenes de las barras de estado/navegación.
+        let (top, bottom, left, right) = system_insets(ctx);
+        let blank = egui::Frame::NONE.fill(colors::BG_MAIN);
+        if top > 0.0 {
+            egui::TopBottomPanel::top("inset_top").exact_height(top).frame(blank).show(ctx, |_| {});
+        }
+        if bottom > 0.0 {
+            egui::TopBottomPanel::bottom("inset_bottom").exact_height(bottom).frame(blank).show(ctx, |_| {});
+        }
+        if left > 0.0 {
+            egui::SidePanel::left("inset_left").exact_width(left).frame(blank).show(ctx, |_| {});
+        }
+        if right > 0.0 {
+            egui::SidePanel::right("inset_right").exact_width(right).frame(blank).show(ctx, |_| {});
+        }
 
         self.bottom_panel(ctx);
         egui::CentralPanel::default()
